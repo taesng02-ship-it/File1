@@ -160,7 +160,7 @@ const HOLIDAYS = new Set([
   '2026-09-25','2026-09-26','2026-10-03','2026-10-09','2026-12-25'
 ]);
 
-function dateKey(d){ return d.toISOString().slice(0,10); }
+function dateKey(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function isHoliday(d){ return HOLIDAYS.has(dateKey(d)); }
 function isWeekend(d){ const w=d.getDay(); return w===0||w===6; }
 function isWeekdayType(d){ return !isWeekend(d)&&!isHoliday(d); }
