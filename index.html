@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0a0a0f">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="부천역">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>부천역 1호선</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a0f;--bg2:#111118;--bg3:#1a1a24;--ln:rgba(255,255,255,0.07);--t1:#f0f0f5;--t2:#8888a0;--t3:#4a4a60;--red:#e53935;--rdim:rgba(229,57,53,0.15);--blue:#4a9eff;--bdim:rgba(74,158,255,0.12);--green:#00c853;--mono:'JetBrains Mono',monospace;--sans:'Noto Sans KR',sans-serif}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+.app{display:flex;flex-direction:column;height:100dvh;max-width:480px;margin:0 auto}
+
+/* 헤더 */
+.hdr{padding:13px 16px 10px;background:var(--bg);border-bottom:1px solid var(--ln);flex-shrink:0}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.hdr-l{display:flex;align-items:center;gap:8px}
+.pulse{width:9px;height:9px;border-radius:50%;background:var(--red);box-shadow:0 0 8px var(--red);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 6px var(--red)}50%{box-shadow:0 0 14px var(--red)}}
+.stn-name{font-size:16px;font-weight:700}
+.line-badge{background:var(--rdim);border:1px solid rgba(229,57,53,.3);color:var(--red);font-size:11px;font-weight:700;padding:2px 7px;border-radius:4px;font-family:var(--mono)}
+.hdr-r{display:flex;align-items:center;gap:8px}
+.clock{font-family:var(--mono);font-size:12px;color:var(--t2)}
+.clr-btn{background:transparent;border:1px solid var(--ln);border-radius:6px;padding:3px 9px;color:var(--t3);font-size:11px;cursor:pointer;font-family:var(--sans)}
+.clr-btn:active{color:var(--red);border-color:rgba(229,57,53,.4)}
+
+/* 탭 */
+.tabs{display:flex;gap:6px}
+.tab{flex:1;padding:7px 0;border-radius:8px;border:1px solid var(--ln);background:transparent;color:var(--t2);font-family:var(--sans);font-size:13px;font-weight:500;cursor:pointer;text-align:center;transition:all .2s}
+.tab small{font-size:10px;opacity:.65;display:block;margin-top:1px}
+.tab.on{background:var(--rdim);border-color:rgba(229,57,53,.4);color:var(--red);font-weight:700}
+
+/* 채팅 */
+.chat{flex:1;overflow-y:auto;padding:13px 13px 6px;display:flex;flex-direction:column;gap:9px;scroll-behavior:smooth}
+.chat::-webkit-scrollbar{width:0}
+.row{display:flex;flex-direction:column;gap:3px;animation:up .22s ease}
+@keyframes up{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+.row.me{align-items:flex-end}
+.row.bot{align-items:flex-start}
+.bbl{max-width:82%;padding:10px 14px;border-radius:16px;font-size:14px;line-height:1.6;word-break:keep-all}
+.row.me .bbl{background:var(--red);color:#fff;border-bottom-right-radius:4px;font-weight:500}
+.row.bot .bbl{background:var(--bg3);color:var(--t1);border-bottom-left-radius:4px;border:1px solid var(--ln)}
+.ts{font-size:10px;color:var(--t3);font-family:var(--mono);padding:0 4px}
+
+/* 카드 */
+.card{background:var(--bg3);border:1px solid var(--ln);border-radius:13px;padding:13px 15px;max-width:88%;animation:up .22s ease}
+.card.hl{border-color:rgba(229,57,53,.3);background:linear-gradient(135deg,var(--bg3),rgba(229,57,53,.04))}
+.card-lbl{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--t3);margin-bottom:6px;font-family:var(--mono)}
+.card-time{font-size:30px;font-weight:900;font-family:var(--mono);line-height:1;margin-bottom:5px}
+.card-time .u{font-size:13px;color:var(--t2);font-weight:400;margin-left:2px}
+.card-dest{font-size:13px;color:var(--t2);margin-bottom:7px}
+.card-dest b{color:var(--t1)}
+.badges{display:flex;gap:5px;flex-wrap:wrap;margin-top:2px}
+.badge{font-size:11px;font-family:var(--mono);padding:2px 7px;border-radius:4px;font-weight:700}
+.badge.ex{background:var(--rdim);color:var(--red);border:1px solid rgba(229,57,53,.25)}
+.badge.sp{background:rgba(255,152,0,.12);color:#ff9800;border:1px solid rgba(255,152,0,.25)}
+.badge.nr{background:var(--bdim);color:var(--blue);border:1px solid rgba(74,158,255,.25)}
+.badge.no{background:var(--bg2);color:var(--t3);border:1px solid var(--ln)}
+
+/* 다중 */
+.multi{display:flex;flex-direction:column;gap:6px;max-width:88%;animation:up .22s ease}
+.mi{background:var(--bg3);border:1px solid var(--ln);border-radius:10px;padding:10px 13px;display:flex;align-items:center;justify-content:space-between}
+.mi:first-child{border-color:rgba(229,57,53,.3)}
+.mi-l .mi-time{font-family:var(--mono);font-size:20px;font-weight:700}
+.mi:first-child .mi-time{color:var(--red)}
+.mi-l .mi-sub{font-size:12px;color:var(--t2);margin-top:2px}
+.mi-r{display:flex;gap:4px;align-items:center}
+
+/* 타이핑 */
+.typing-wrap{display:flex;align-items:center;gap:4px;padding:11px 15px;background:var(--bg3);border:1px solid var(--ln);border-radius:16px;border-bottom-left-radius:4px;width:fit-content}
+.td{width:6px;height:6px;border-radius:50%;background:var(--t3);animation:tb 1.2s infinite}
+.td:nth-child(2){animation-delay:.2s}.td:nth-child(3){animation-delay:.4s}
+@keyframes tb{0%,60%,100%{transform:translateY(0);background:var(--t3)}30%{transform:translateY(-5px);background:var(--red)}}
+
+/* 빠른버튼 */
+.qbtns{padding:6px 13px;display:flex;gap:5px;overflow-x:auto;flex-shrink:0}
+.qbtns::-webkit-scrollbar{display:none}
+.qbtn{flex-shrink:0;padding:6px 12px;border-radius:20px;border:1px solid var(--ln);background:var(--bg2);color:var(--t2);font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;transition:all .15s}
+.qbtn:active{background:var(--rdim);border-color:rgba(229,57,53,.4);color:var(--red);transform:scale(.96)}
+
+/* 입력 */
+.inp-area{padding:8px 13px 18px;background:var(--bg);border-top:1px solid var(--ln);flex-shrink:0}
+.inp-row{display:flex;gap:8px;align-items:center;background:var(--bg3);border:1px solid var(--ln);border-radius:24px;padding:5px 5px 5px 15px;transition:border-color .2s}
+.inp-row:focus-within{border-color:rgba(229,57,53,.4)}
+.inp{flex:1;background:transparent;border:none;outline:none;font-family:var(--sans);font-size:14px;color:var(--t1);caret-color:var(--red)}
+.inp::placeholder{color:var(--t3)}
+.send{width:37px;height:37px;border-radius:50%;background:var(--red);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.send:active{transform:scale(.9);background:#c62828}
+.send svg{width:15px;height:15px;fill:#fff}
+
+/* 날짜 뱃지 */
+.day-badge{display:inline-block;font-size:10px;font-family:var(--mono);font-weight:700;padding:2px 7px;border-radius:4px;margin-bottom:6px}
+.day-badge.weekday{background:var(--bdim);color:var(--blue);border:1px solid rgba(74,158,255,.25)}
+.day-badge.weekend{background:rgba(255,152,0,.1);color:#ff9800;border:1px solid rgba(255,152,0,.25)}
+.day-badge.holiday{background:var(--rdim);color:var(--red);border:1px solid rgba(229,57,53,.25)}
+/* 오전/오후 팝업 */
+.ampm-popup{display:none;padding:5px 13px;gap:7px;animation:up .15s ease}
+.ampm-popup.show{display:flex}
+.ampm-btn{flex:1;padding:8px 0;border-radius:10px;border:1px solid var(--ln);background:var(--bg2);color:var(--t2);font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;text-align:center}
+.ampm-btn.am:active,.ampm-btn.am:focus{background:var(--bdim);border-color:rgba(74,158,255,.4);color:var(--blue)}
+.ampm-btn.pm:active,.ampm-btn.pm:focus{background:var(--rdim);border-color:rgba(229,57,53,.4);color:var(--red)}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="hdr">
+    <div class="hdr-top">
+      <div class="hdr-l">
+        <div class="pulse"></div>
+        <span class="stn-name">부천역</span>
+        <span class="line-badge">1호선</span>
+      </div>
+      <div class="hdr-r">
+        <span class="clock" id="clock"></span>
+        <button class="clr-btn" onclick="clearChat()">🗑 초기화</button>
+      </div>
+    </div>
+    <div class="tabs">
+      <button class="tab on" id="tab-seoul" onclick="setDir('seoul')">서울 방향<small>동두천 · 소요산 · 의정부</small></button>
+      <button class="tab" id="tab-incheon" onclick="setDir('incheon')">인천 방향<small>인천 · 동인천 · 부평</small></button>
+    </div>
+  </div>
+  <div class="chat" id="chat"></div>
+  <div class="qbtns">
+    <button class="qbtn" onclick="qa('첫차 알려줘')">🌅 첫차</button>
+    <button class="qbtn" onclick="qa('막차 알려줘')">🌙 막차</button>
+    <button class="qbtn" onclick="qa('다음 차 알려줘')">🚇 다음 차</button>
+    <button class="qbtn" onclick="qa('지금 배차간격 어때')">⏱ 배차간격</button>
+    <a class="qbtn" href="https://map.naver.com/p/directions/3z9tlI,2AIAAK,%EB%B6%80%EC%B2%9C%EC%97%AD%201%ED%98%B8%EC%84%A0,148,SUBWAY_STATION/-/-/transit?c=16.00,0,0,0,dh" target="_blank" style="text-decoration:none;display:flex;align-items:center;">🗺 네이버지도</a>
+  </div>
+  <div class="ampm-popup" id="ampm-popup">
+    <button class="ampm-btn am" onclick="applyAmPm('오전')">🌅 오전</button>
+    <button class="ampm-btn pm" onclick="applyAmPm('오후')">🌆 오후</button>
+  </div>
+  <div class="inp-area">
+    <div class="inp-row">
+      <input class="inp" id="inp" placeholder="질문을 입력하세요..." autocomplete="off" onkeydown="if(event.key==='Enter')send()" oninput="checkAmPm(this.value)">
+      <button class="send" onclick="send()"><svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg></button>
+    </div>
+  </div>
+</div>
+<script>
+// ================================================================
+// 1. 공휴일 (2025~2026)
+// ================================================================
+const HOLIDAYS = new Set([
+  '2025-01-01','2025-01-28','2025-01-29','2025-01-30',
+  '2025-03-01','2025-05-05','2025-05-06','2025-05-15',
+  '2025-06-06','2025-08-15','2025-10-03','2025-10-05',
+  '2025-10-06','2025-10-07','2025-10-09','2025-12-25',
+  '2026-01-01','2026-01-28','2026-01-29','2026-01-30',
+  '2026-03-01','2026-05-05','2026-05-06','2026-05-25',
+  '2026-06-03','2026-06-06','2026-08-15','2026-09-24',
+  '2026-09-25','2026-09-26','2026-10-03','2026-10-09','2026-12-25'
+]);
+
+function dateKey(d){ return d.toISOString().slice(0,10); }
+function isHoliday(d){ return HOLIDAYS.has(dateKey(d)); }
+function isWeekend(d){ const w=d.getDay(); return w===0||w===6; }
+function isWeekdayType(d){ return !isWeekend(d)&&!isHoliday(d); }
+function getDayType(d){
+  if(isHoliday(d)) return 'holiday';
+  if(isWeekend(d)) return 'weekend';
+  return 'weekday';
+}
+function getDayLabel(type){
+  if(type==='holiday') return '공휴일';
+  if(type==='weekend') return '주말';
+  return '평일';
+}
+
+// ================================================================
+// 2. 시간표 데이터
+// 형식: [분(0=00:00), 행선지, 열차종별]
+// 종별: 'local'=완행, 'express'=급행, 'special'=특급
+// ================================================================
+function t(hhmm, dest, type){
+  const [h,m]=hhmm.split(':').map(Number);
+  return [h*60+m, dest, type||'local'];
+}
+
+// 행선지 정규화 (급/특 suffix 분리)
+function parseDest(raw){
+  if(raw.endsWith('특')) return {dest:raw.slice(0,-1), type:'special'};
+  if(raw.endsWith('급')) return {dest:raw.slice(0,-1), type:'express'};
+  return {dest:raw, type:'local'};
+}
+
+// ── 평일 서울방향 ──
+const WD_SEOUL = [
+  t('05:11','동두천'),t('05:31','동두천','express'),t('05:32','용산','express'),
+  t('05:40','동두천'),t('05:47','용산','express'),t('05:50','동두천'),t('05:58','용산','express'),
+  t('06:03','연천'),t('06:08','용산','express'),t('06:10','동두천'),t('06:19','소요산'),
+  t('06:22','용산','express'),t('06:29','동두천'),t('06:36','용산','express'),
+  t('06:37','동두천'),t('06:44','용산','express'),t('06:50','동두천'),t('06:53','용산','express'),
+  t('07:00','연천'),t('07:02','용산','express'),t('07:09','의정부'),t('07:09','용산','express'),
+  t('07:15','용산','express'),t('07:18','소요산'),t('07:23','용산','express'),
+  t('07:25','양주'),t('07:30','용산','express'),t('07:31','동두천'),t('07:35','용산','express'),
+  t('07:38','의정부'),t('07:40','용산','express'),t('07:46','동두천','express'),
+  t('07:46','용산','express'),t('07:53','양주'),t('07:54','용산','special'),t('07:58','용산','express'),
+  t('08:02','연천'),t('08:03','용산','express'),t('08:10','의정부'),t('08:11','용산','special'),
+  t('08:17','용산','express'),t('08:19','양주'),t('08:25','용산','express'),t('08:29','소요산'),
+  t('08:29','용산','express'),t('08:34','용산','express'),t('08:36','동묘앞'),
+  t('08:40','용산','express'),t('08:46','용산','express'),t('08:48','양주'),
+  t('08:52','용산','express'),t('08:56','동묘앞'),t('08:59','용산','express'),
+  t('09:03','연천'),t('09:09','용산','express'),t('09:12','의정부'),t('09:18','용산','special'),
+  t('09:25','용산','express'),t('09:26','소요산'),t('09:33','용산','express'),
+  t('09:42','구로','express'),t('09:44','동두천','express'),t('09:52','용산','special'),t('09:53','양주'),
+  t('10:02','연천'),t('10:02','구로','express'),t('10:10','용산','express'),t('10:13','의정부'),
+  t('10:22','소요산'),t('10:22','구로','express'),t('10:27','양주'),t('10:31','용산','special'),
+  t('10:36','구로'),t('10:45','양주'),t('10:46','구로','express'),t('10:54','용산','express'),
+  t('10:57','동두천','express'),
+  t('11:05','연천'),t('11:11','용산','express'),t('11:14','의정부'),t('11:22','소요산'),
+  t('11:25','용산','express'),t('11:31','양주'),t('11:39','의정부'),t('11:43','용산','special'),
+  t('11:49','동두천','express'),t('11:58','양주'),
+  t('12:04','용산','express'),t('12:18','용산','express'),t('12:22','양주'),t('12:31','소요산'),
+  t('12:47','양주'),t('12:48','용산','express'),t('12:58','동두천','express'),
+  t('13:16','의정부'),t('13:17','용산','express'),t('13:25','소요산'),t('13:36','양주'),
+  t('13:42','의정부'),t('13:45','용산','express'),t('13:52','광운대'),
+  t('14:10','양주'),t('14:10','용산','express'),t('14:26','소요산'),t('14:35','양주'),
+  t('14:47','의정부'),t('14:58','연천'),
+  t('15:08','동묘앞'),t('15:10','용산','express'),t('15:13','의정부'),t('15:22','소요산'),
+  t('15:31','의정부'),t('15:37','용산','express'),t('15:38','동두천'),t('15:46','양주'),
+  t('15:56','용산','express'),
+  t('16:00','연천'),t('16:10','용산','special'),t('16:15','의정부'),t('16:24','소요산'),
+  t('16:24','용산','express'),t('16:30','양주'),t('16:38','동묘앞'),t('16:42','용산','express'),
+  t('16:45','동두천'),t('16:52','양주'),
+  t('17:00','연천'),t('17:02','용산','express'),t('17:07','동두천'),t('17:14','의정부'),
+  t('17:16','용산','express'),t('17:24','양주'),t('17:29','용산','express'),t('17:32','연천'),
+  t('17:39','양주'),t('17:40','용산','express'),t('17:48','용산','express'),t('17:55','양주'),
+  t('17:56','용산','express'),
+  t('18:02','연천'),t('18:08','용산','express'),t('18:10','동두천'),t('18:17','의정부'),
+  t('18:18','용산','express'),t('18:21','동묘앞'),t('18:27','용산','express'),t('18:29','양주'),
+  t('18:34','용산','express'),t('18:37','소요산'),t('18:41','용산','express'),t('18:45','동묘앞'),
+  t('18:48','용산','express'),t('18:52','동두천'),t('18:57','용산','express'),
+  t('19:00','양주'),t('19:03','용산','express'),t('19:10','용산','express'),t('19:13','연천'),
+  t('19:16','용산','express'),t('19:22','용산','express'),t('19:23','의정부'),
+  t('19:28','용산','express'),t('19:34','소요산'),t('19:40','용산','express'),t('19:43','양주'),
+  t('19:46','용산','express'),t('19:53','동두천'),t('19:54','구로','express'),t('19:59','용산','express'),
+  t('20:01','양주'),t('20:04','용산','express'),t('20:08','연천'),t('20:09','용산','express'),
+  t('20:16','의정부'),t('20:20','구로','express'),t('20:26','용산','express'),t('20:27','소요산'),
+  t('20:32','용산','express'),t('20:38','구로'),t('20:40','용산','express'),t('20:44','양주'),
+  t('20:46','구로','express'),t('20:50','용산','express'),t('20:52','의정부'),t('20:59','구로','express'),
+  t('21:02','연천'),t('21:09','용산','express'),t('21:10','양주'),t('21:15','구로','express'),
+  t('21:18','소요산'),t('21:26','용산','express'),t('21:29','의정부'),t('21:32','구로','express'),
+  t('21:38','동두천'),t('21:41','용산','express'),t('21:48','양주'),t('21:52','구로','express'),
+  t('21:58','용산','express'),t('21:58','의정부'),
+  t('22:11','용산','express'),t('22:12','연천'),t('22:21','용산','express'),t('22:22','광운대'),
+  t('22:32','용산','express'),t('22:35','소요산'),t('22:42','양주'),t('22:44','구로','express'),
+  t('22:55','의정부'),
+  t('23:08','광운대'),t('23:11','구로','express'),t('23:22','광운대'),t('23:26','부천','express'),
+  t('23:32','구로'),t('23:44','동묘앞'),
+  t('24:00','구로'),t('24:13','구로'),
+];
+
+// ── 평일 인천방향 ──
+const WD_INCHEON = [
+  t('05:16','인천'),t('05:27','인천'),t('05:36','인천'),t('05:42','동인천','express'),
+  t('05:48','인천'),t('05:52','동인천','express'),t('05:58','인천'),
+  t('06:02','동인천','express'),t('06:08','인천'),t('06:12','동인천','express'),
+  t('06:15','인천'),t('06:21','동인천','express'),t('06:25','인천'),
+  t('06:30','동인천','express'),t('06:35','인천'),t('06:35','동인천','express'),
+  t('06:42','인천'),t('06:45','부평','express'),t('06:50','동인천','express'),
+  t('06:51','인천'),t('06:56','동인천','express'),
+  t('07:00','인천'),t('07:02','동인천','express'),t('07:07','부평','express'),
+  t('07:09','인천'),t('07:11','동인천','express'),t('07:16','인천'),
+  t('07:17','동인천','express'),t('07:22','동인천','express'),t('07:25','인천'),
+  t('07:26','부평','express'),t('07:33','동인천','express'),t('07:34','인천'),
+  t('07:40','동인천','express'),t('07:41','인천'),t('07:47','동인천','express'),
+  t('07:49','인천'),t('07:53','동인천','express'),t('07:56','인천'),t('07:58','부평','express'),
+  t('08:07','동인천','express'),t('08:08','인천'),t('08:14','동인천','express'),
+  t('08:19','부평','express'),t('08:21','인천'),t('08:28','동인천','express'),
+  t('08:28','인천'),t('08:34','동인천','express'),t('08:39','동인천','express'),
+  t('08:41','인천'),t('08:48','인천'),t('08:49','동인천','express'),t('08:55','부평','express'),
+  t('09:01','동인천','express'),t('09:02','인천'),t('09:13','인천'),
+  t('09:13','인천','express'),t('09:19','부평'),t('09:20','동인천','express'),
+  t('09:25','인천'),t('09:33','인천'),t('09:33','동인천','express'),
+  t('09:37','부평'),t('09:45','인천'),t('09:46','동인천','special'),
+  t('09:52','인천','express'),t('09:55','동인천','express'),t('09:58','동인천'),
+  t('10:05','인천'),t('10:05','동인천','express'),t('10:14','인천'),t('10:22','인천'),
+  t('10:22','동인천','express'),t('10:33','인천'),t('10:36','동인천','express'),
+  t('10:48','인천'),t('10:57','동인천','special'),
+  t('11:09','인천'),t('11:13','동인천','express'),t('11:18','인천'),
+  t('11:29','동인천','special'),t('11:32','인천'),t('11:43','인천'),t('11:58','동인천','express'),
+  t('12:05','인천'),t('12:11','인천','express'),t('12:21','인천'),
+  t('12:28','동인천','express'),t('12:29','인천'),t('12:41','인천'),
+  t('12:54','동인천','express'),t('12:59','인천'),
+  t('13:12','인천','express'),t('13:21','동인천','express'),t('13:22','인천'),
+  t('13:31','인천'),t('13:40','인천'),t('13:51','인천'),
+  t('14:03','인천'),t('14:11','인천','express'),t('14:17','인천'),
+  t('14:21','동인천','express'),t('14:26','인천'),t('14:34','인천'),
+  t('14:48','인천'),t('14:48','동인천','express'),
+  t('15:05','동인천','express'),t('15:05','인천'),t('15:13','인천','express'),
+  t('15:22','동인천','express'),t('15:23','인천'),t('15:34','동인천','express'),
+  t('15:38','인천'),t('15:50','인천'),t('15:50','동인천','express'),t('15:56','인천'),
+  t('16:03','인천'),t('16:11','인천'),t('16:13','동인천','express'),t('16:20','인천'),
+  t('16:29','인천'),t('16:29','동인천','special'),t('16:40','동인천','express'),
+  t('16:43','인천'),t('16:51','동인천','express'),t('16:52','인천'),t('16:59','동인천','express'),
+  t('17:04','인천'),t('17:07','동인천','express'),t('17:09','인천'),
+  t('17:15','동인천','express'),t('17:17','인천','express'),t('17:26','인천'),
+  t('17:27','동인천','express'),t('17:34','인천'),t('17:35','동인천','express'),
+  t('17:41','인천'),t('17:42','동인천','express'),t('17:49','인천'),
+  t('17:49','동인천','express'),t('17:58','동인천','express'),
+  t('18:01','인천'),t('18:05','동인천','express'),t('18:10','인천'),
+  t('18:13','동인천','express'),t('18:21','동인천','express'),t('18:23','인천'),
+  t('18:31','인천'),t('18:32','동인천','express'),t('18:39','동인천','express'),
+  t('18:40','인천'),t('18:44','부평','express'),t('18:49','인천'),
+  t('18:51','동인천','express'),t('18:56','인천'),t('18:58','동인천','special'),
+  t('19:05','동인천','express'),t('19:06','인천'),t('19:10','동인천','express'),
+  t('19:15','인천'),t('19:15','동인천','express'),t('19:22','동인천','special'),
+  t('19:25','인천'),t('19:31','동인천','express'),t('19:33','인천'),
+  t('19:37','동인천','express'),t('19:41','인천'),t('19:43','동인천','special'),
+  t('19:51','인천'),t('19:51','동인천','express'),t('19:58','동인천','special'),
+  t('20:00','인천'),t('20:06','인천'),t('20:06','동인천','express'),
+  t('20:13','동인천','express'),t('20:19','인천'),t('20:19','부평','express'),
+  t('20:25','동인천','express'),t('20:28','인천'),t('20:31','동인천','express'),
+  t('20:36','인천'),t('20:43','동인천','express'),t('20:47','인천'),
+  t('20:52','동인천','express'),t('20:54','인천'),
+  t('21:02','인천'),t('21:02','동인천','express'),t('21:09','동인천','express'),
+  t('21:11','인천'),t('21:21','인천'),t('21:22','동인천','express'),
+  t('21:30','동인천','express'),t('21:31','인천'),t('21:41','인천'),
+  t('21:43','동인천','express'),t('21:51','인천'),t('21:53','동인천','express'),
+  t('22:00','인천'),t('22:08','인천'),t('22:16','동인천','express'),t('22:18','인천'),
+  t('22:27','인천'),t('22:30','동인천','express'),t('22:40','인천'),
+  t('22:44','동인천','express'),t('22:52','인천'),
+  t('23:01','인천'),t('23:02','동인천','express'),t('23:14','인천'),
+  t('23:20','동인천','express'),t('23:29','인천'),t('23:36','부평','express'),t('23:50','인천'),
+  t('24:01','인천'),t('24:10','인천'),
+];
+
+// ── 주말/공휴일 서울방향 ──
+const WE_SEOUL = [
+  t('05:17','소요산'),t('05:31','양주'),t('05:32','용산','express'),
+  t('05:41','동두천'),t('05:50','용산','express'),t('05:53','연천'),
+  t('06:03','용산','express'),t('06:06','양주'),t('06:19','소요산'),
+  t('06:21','용산','express'),t('06:30','양주'),t('06:38','용산','express'),
+  t('06:41','동두천'),t('06:51','양주'),t('06:54','용산','express'),t('06:59','연천'),
+  t('07:08','의정부'),t('07:12','용산','express'),t('07:18','양주'),
+  t('07:28','용산','express'),t('07:30','소요산'),t('07:38','의정부'),
+  t('07:44','용산','express'),t('07:48','동두천'),
+  t('08:00','용산','express'),t('08:01','연천'),t('08:15','양주'),
+  t('08:17','용산','express'),t('08:29','소요산'),t('08:33','용산','express'),
+  t('08:39','광운대'),t('08:46','동두천'),t('08:53','용산','express'),
+  t('09:02','연천'),t('09:11','용산','express'),t('09:12','의정부'),
+  t('09:25','소요산'),t('09:29','용산','express'),t('09:36','양주'),
+  t('09:46','용산','special'),t('09:46','동두천'),t('09:55','양주'),t('09:59','용산','express'),
+  t('10:02','연천'),t('10:11','의정부'),t('10:12','용산','express'),
+  t('10:25','광운대'),t('10:27','용산','express'),t('10:36','양주'),
+  t('10:40','용산','express'),t('10:48','동두천'),t('10:54','용산','special'),t('10:56','양주'),
+  t('11:09','용산','express'),t('11:11','연천'),t('11:21','소요산'),
+  t('11:24','용산','express'),t('11:30','양주'),t('11:38','용산','express'),
+  t('11:38','의정부'),t('11:50','동두천'),t('11:50','용산','special'),t('11:59','양주'),
+  t('12:02','용산','express'),t('12:07','연천'),t('12:13','용산','express'),
+  t('12:22','소요산'),t('12:28','용산','express'),t('12:33','양주'),
+  t('12:41','용산','express'),t('12:42','의정부'),t('12:52','동두천'),
+  t('12:53','용산','special'),
+  t('13:01','양주'),t('13:07','용산','express'),t('13:16','의정부'),
+  t('13:20','용산','express'),t('13:26','소요산'),t('13:34','용산','express'),
+  t('13:37','양주'),t('13:43','동두천'),t('13:46','용산','special'),t('13:53','양주'),
+  t('13:56','용산','express'),
+  t('14:04','연천'),t('14:09','용산','express'),t('14:16','의정부'),
+  t('14:21','용산','express'),t('14:24','소요산'),t('14:34','용산','express'),
+  t('14:35','양주'),t('14:44','구로'),t('14:45','용산','express'),t('14:50','의정부'),
+  t('15:01','연천'),t('15:13','의정부'),t('15:20','용산','express'),
+  t('15:22','소요산'),t('15:30','의정부'),t('15:33','용산','express'),
+  t('15:37','양주'),t('15:43','용산','special'),t('15:45','동두천'),
+  t('15:56','용산','express'),t('15:59','양주'),
+  t('16:07','용산','express'),t('16:08','연천'),t('16:16','의정부'),
+  t('16:17','용산','express'),t('16:27','구로'),t('16:33','용산','express'),
+  t('16:37','동묘앞'),t('16:44','용산','special'),t('16:52','의정부'),t('16:58','용산','express'),
+  t('17:02','양주'),t('17:12','용산','express'),t('17:16','양주'),
+  t('17:25','소요산'),t('17:25','용산','express'),t('17:37','용산','special'),
+  t('17:40','동두천'),t('17:48','용산','express'),t('17:52','광운대'),
+  t('18:00','동묘앞'),t('18:05','용산','express'),t('18:09','의정부'),
+  t('18:16','용산','express'),t('18:18','동묘앞'),t('18:29','용산','express'),
+  t('18:29','의정부'),t('18:34','양주'),t('18:41','용산','express'),
+  t('18:49','양주'),t('18:52','용산','express'),t('18:56','연천'),
+  t('19:04','광운대'),t('19:08','용산','express'),t('19:14','동두천'),
+  t('19:23','용산','express'),t('19:23','소요산'),t('19:33','양주'),
+  t('19:40','용산','express'),t('19:46','의정부'),t('19:52','용산','express'),t('19:55','연천'),
+  t('20:04','용산','express'),t('20:08','양주'),t('20:16','용산','express'),
+  t('20:22','동두천'),t('20:30','용산','express'),t('20:32','소요산'),
+  t('20:40','양주'),t('20:47','용산','express'),t('20:49','의정부'),
+  t('20:57','구로','express'),t('20:59','연천'),
+  t('21:08','의정부'),t('21:09','용산','express'),t('21:17','소요산'),
+  t('21:26','용산','express'),t('21:27','양주'),t('21:36','동두천'),
+  t('21:41','용산','express'),t('21:45','동묘앞'),t('21:56','연천'),t('21:57','용산','express'),
+  t('22:07','의정부'),t('22:12','용산','express'),t('22:14','광운대'),
+  t('22:27','소요산'),t('22:31','용산','express'),t('22:36','광운대'),
+  t('22:46','양주'),t('22:48','용산','express'),t('22:57','의정부'),
+  t('23:03','광운대'),t('23:11','용산','express'),t('23:12','구로'),
+  t('23:22','광운대'),t('23:26','부천','express'),t('23:35','지하서울역'),t('23:50','구로'),
+  t('24:05','구로'),
+];
+
+// ── 주말/공휴일 인천방향 ──
+const WE_INCHEON = [
+  t('05:16','인천'),t('05:31','인천'),t('05:51','인천'),
+  t('06:02','동인천','express'),t('06:08','인천'),t('06:19','동인천','express'),
+  t('06:20','인천'),t('06:26','인천'),t('06:35','동인천','express'),
+  t('06:38','인천'),t('06:49','인천'),t('06:54','동인천','express'),
+  t('07:02','인천'),t('07:10','동인천','express'),t('07:16','인천'),
+  t('07:24','인천'),t('07:25','동인천','express'),t('07:34','인천'),
+  t('07:43','동인천','express'),t('07:48','인천'),t('07:57','인천'),
+  t('08:01','동인천','express'),t('08:12','인천'),t('08:18','동인천','express'),
+  t('08:21','인천'),t('08:30','인천'),t('08:36','동인천','express'),
+  t('08:42','인천'),t('08:50','인천'),t('08:57','동인천','express'),t('08:57','인천'),
+  t('09:09','동인천','express'),t('09:10','인천'),t('09:19','인천'),
+  t('09:22','동인천','express'),t('09:34','인천'),t('09:37','동인천','express'),
+  t('09:43','인천'),t('09:50','동인천','express'),t('09:53','인천'),
+  t('10:01','인천'),t('10:06','동인천','special'),t('10:10','인천'),t('10:20','인천'),
+  t('10:20','동인천','express'),t('10:33','동인천','express'),t('10:34','인천'),
+  t('10:46','동인천','express'),t('10:47','인천'),t('10:56','인천'),
+  t('11:00','동인천','special'),t('11:06','인천'),t('11:11','동인천','express'),
+  t('11:20','인천'),t('11:23','동인천','express'),t('11:32','인천'),
+  t('11:35','동인천','express'),t('11:42','인천'),t('11:46','동인천','express'),t('11:51','인천'),
+  t('12:01','동인천','special'),t('12:02','인천'),t('12:11','인천'),
+  t('12:13','동인천','express'),t('12:21','인천'),t('12:28','동인천','express'),
+  t('12:33','인천'),t('12:41','인천'),t('12:42','동인천','express'),
+  t('12:54','인천'),t('12:54','동인천','special'),
+  t('13:02','인천'),t('13:05','동인천','express'),t('13:10','인천'),
+  t('13:18','동인천','express'),t('13:21','인천'),t('13:31','인천'),
+  t('13:32','동인천','express'),t('13:40','인천'),t('13:44','동인천','express'),
+  t('13:51','인천'),t('13:55','동인천','express'),
+  t('14:03','인천'),t('14:11','인천'),t('14:19','인천'),t('14:27','인천'),
+  t('14:29','동인천','express'),t('14:35','인천'),t('14:43','동인천','express'),
+  t('14:47','인천'),t('14:55','인천'),t('14:55','동인천','special'),
+  t('15:05','인천'),t('15:06','동인천','express'),t('15:16','인천'),
+  t('15:17','동인천','express'),t('15:26','인천'),t('15:29','동인천','express'),
+  t('15:36','인천'),t('15:42','동인천','express'),t('15:52','인천'),
+  t('15:55','동인천','special'),
+  t('16:01','인천'),t('16:07','동인천','express'),t('16:10','인천'),t('16:20','인천'),
+  t('16:23','동인천','express'),t('16:29','인천'),t('16:36','동인천','express'),
+  t('16:42','인천'),t('16:50','동인천','special'),t('16:57','인천'),
+  t('16:59','동인천','express'),
+  t('17:04','인천'),t('17:11','인천'),t('17:12','동인천','express'),t('17:23','인천'),
+  t('17:25','동인천','express'),t('17:32','인천'),t('17:38','동인천','express'),
+  t('17:41','인천'),t('17:52','인천'),t('17:54','동인천','special'),
+  t('18:02','동인천','express'),t('18:03','인천'),t('18:11','인천'),
+  t('18:17','동인천','express'),t('18:22','인천'),t('18:30','동인천','express'),
+  t('18:36','인천'),t('18:44','동인천','express'),t('18:45','인천'),t('18:54','인천'),
+  t('19:00','동인천','express'),t('19:09','인천'),t('19:11','동인천','express'),
+  t('19:22','인천'),t('19:23','동인천','express'),t('19:29','인천'),
+  t('19:33','동인천','express'),t('19:34','인천'),t('19:42','인천'),
+  t('19:48','인천'),t('19:49','동인천','express'),t('19:56','인천'),
+  t('19:59','동인천','express'),
+  t('20:08','인천'),t('20:15','동인천','express'),t('20:17','인천'),t('20:26','인천'),
+  t('20:31','동인천','express'),t('20:39','인천'),t('20:48','인천'),
+  t('20:50','동인천','express'),t('20:57','인천'),
+  t('21:01','인천'),t('21:07','동인천','express'),t('21:11','인천'),
+  t('21:22','동인천','express'),t('21:23','인천'),t('21:35','인천'),
+  t('21:42','동인천','express'),t('21:44','인천'),t('21:51','인천'),
+  t('21:59','동인천','express'),
+  t('22:00','인천'),t('22:09','인천'),t('22:13','동인천','express'),t('22:21','인천'),
+  t('22:30','동인천','express'),t('22:38','인천'),t('22:45','동인천','express'),t('22:53','인천'),
+  t('23:02','인천'),t('23:02','동인천','express'),t('23:12','인천'),
+  t('23:20','동인천','express'),t('23:22','인천'),t('23:32','인천'),
+  t('23:37','부평','express'),t('23:40','인천'),t('23:51','인천'),
+  t('24:03','인천'),
+];
+
+// ================================================================
+// 3. 정차역 데이터
+// ================================================================
+
+// 서울방향 역 순서 (부천 이후)
+const SEOUL_STATIONS = [
+  '소사','역곡','온수','오류동','개봉','구일','구로',
+  '신도림','영등포','신길','대방','노량진','용산','남영',
+  '서울','시청','종각','종로3가','종로5가','동대문','동묘앞','신설동','제기동','청량리',
+  '회기','외대앞','신이문','석계','광운대',
+  '월계','녹천','창동','방학','도봉','도봉산','망월사','회룡',
+  '의정부','가능','녹양','양주','덕계','덕정','지행','동두천중앙','보산','동두천','소요산',
+  '청산','전곡','연천'
+];
+
+// 인천방향 역 순서 (부천 이후)
+const INCHEON_STATIONS = [
+  '중동','송내','부개','부평','백운','동암','간석','주안','도화','제물포','도원','동인천','인천'
+];
+
+// 서울방향 급행 정차역 (구로~광운대 전구간 정차, 이후 선별)
+const SEOUL_EXPRESS_STOPS = new Set([
+  // 구로~광운대 전부
+  '구로','신도림','영등포','신길','대방','노량진','용산','남영',
+  '서울','시청','종각','종로3가','종로5가','동대문','동묘앞','신설동','제기동','청량리',
+  '회기','외대앞','신이문','석계','광운대',
+  // 광운대 이후 급행 정차역
+  '창동','도봉산','회룡','의정부','양주','덕정','동두천중앙','동두천'
+]);
+
+// 인천방향 급행 정차역
+const INCHEON_EXPRESS_STOPS = new Set([
+  '영등포','신도림','구로','개봉','역곡','부천','송내','부평','동암','주안','제물포','동인천'
+]);
+
+// 인천방향 특급 정차역
+const INCHEON_SPECIAL_STOPS = new Set([
+  '영등포','신도림','구로','역곡','부천','송내','부평','주안','동인천'
+]);
+
+// 종착역 인덱스
+function destIdx(dest, dir) {
+  const list = dir==='seoul' ? SEOUL_STATIONS : INCHEON_STATIONS;
+  // 종착역 정규화
+  const normalized = dest.replace(/급$|특$|행$/,'');
+  const idx = list.indexOf(normalized);
+  return idx;
+}
+
+// 열차가 목적지역에 정차하는지 판별
+function stops(train, targetStation, dir) {
+  const [min, dest, type] = train;
+
+  // 1) 종착역이 목적지보다 앞이면 제외
+  const list = dir==='seoul' ? SEOUL_STATIONS : INCHEON_STATIONS;
+  const dIdx = list.indexOf(dest);
+  const tIdx = list.indexOf(targetStation);
+  if(dIdx===-1 || tIdx===-1) return true; // 모르면 포함
+  if(dIdx < tIdx) return false; // 종착이 더 앞
+
+  // 2) 완행은 모든 역 정차
+  if(type==='local') return true;
+
+  // 3) 급행/특급 정차역 확인
+  if(dir==='seoul') {
+    // 소사~구일은 급행도 정차 안 함 (구로부터 시작)
+    return SEOUL_EXPRESS_STOPS.has(targetStation);
+  } else {
+    if(type==='special') return INCHEON_SPECIAL_STOPS.has(targetStation);
+    if(type==='express') return INCHEON_EXPRESS_STOPS.has(targetStation);
+  }
+  return true;
+}
+
+// ================================================================
+// 4. 날짜/시간 파싱
+// ================================================================
+function nowMin() {
+  const n=new Date(); return n.getHours()*60+n.getMinutes();
+}
+function minToStr(m) {
+  const hh=Math.floor(m/60)%24, mm=m%60;
+  return String(hh).padStart(2,'0')+':'+String(mm).padStart(2,'0');
+}
+function nowStr() {
+  const n=new Date();
+  return String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
+}
+
+// 텍스트에서 날짜 파싱 → Date 반환
+function parseTargetDate(text) {
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
+  // 오늘/내일/모레
+  if(/내일/.test(text)) { const d=new Date(today); d.setDate(d.getDate()+1); return d; }
+  if(/모레/.test(text)) { const d=new Date(today); d.setDate(d.getDate()+2); return d; }
+  if(/오늘|지금|현재/.test(text)) return today;
+
+  // "평일" → 오늘이 평일이면 오늘, 아니면 다음 월요일
+  if(/평일/.test(text)) {
+    const d = new Date(today);
+    while(!isWeekdayType(d)) d.setDate(d.getDate()+1);
+    return d;
+  }
+
+  // "주말" → 오늘이 주말이면 오늘, 아니면 다음 토요일
+  if(/주말/.test(text)) {
+    const d = new Date(today);
+    while(!isWeekend(d)) d.setDate(d.getDate()+1);
+    return d;
+  }
+
+  // "공휴일" → 다음 공휴일
+  if(/공휴일/.test(text)) {
+    const d = new Date(today);
+    d.setDate(d.getDate()+1); // 내일부터 탐색
+    for(let i=0; i<365; i++) {
+      if(isHoliday(d)) return d;
+      d.setDate(d.getDate()+1);
+    }
+    return today;
+  }
+
+  // "N/M" 또는 "N월 M일"
+  const slashM = text.match(/(\d{1,2})\/(\d{1,2})/);
+  if(slashM) {
+    const month = parseInt(slashM[1])-1;
+    const day   = parseInt(slashM[2]);
+    const year  = today.getFullYear();
+    const d = new Date(year, month, day);
+    d.setHours(0,0,0,0);
+    if(d < today) d.setFullYear(year+1);
+    return d;
+  }
+
+  const dotM = text.match(/(\d{1,2})\s*월\s*(\d{1,2})\s*일/);
+  if(dotM) {
+    const month = parseInt(dotM[1])-1;
+    const day   = parseInt(dotM[2]);
+    const year  = today.getFullYear();
+    const d = new Date(year, month, day);
+    d.setHours(0,0,0,0);
+    if(d < today) d.setFullYear(year+1);
+    return d;
+  }
+
+  // "N요일" → 이번 주 혹은 다음 주
+  const dayMap = {'월':1,'화':2,'수':3,'목':4,'금':5,'토':6,'일':0};
+  const wm = text.match(/([월화수목금토일])요일/);
+  if(wm) {
+    const target = dayMap[wm[1]];
+    const cur = today.getDay();
+    let diff = target - cur;
+    if(diff <= 0) diff += 7;
+    const d = new Date(today);
+    d.setDate(d.getDate()+diff);
+    return d;
+  }
+
+  return today;
+}
+
+// 텍스트에서 시간(분) 파싱
+function parseTime(text) {
+  // 날짜 형식(N/M) 제거 후 시간 파싱 (5/3 4:16에서 3:을 시간으로 오인 방지)
+  const cleaned = text.replace(/\d{1,2}\/\d{1,2}/, '');
+  // HH:MM
+  let m = cleaned.match(/(\d{1,2}):(\d{2})/);
+  if(m) {
+    let h=parseInt(m[1]), min=parseInt(m[2]);
+    if(/오후|pm/i.test(text) && h<12) h+=12;
+    return h*60+min;
+  }
+  // N시 M분
+  m = text.match(/(\d{1,2})\s*시\s*(\d{1,2})\s*분/);
+  if(m) {
+    let h=parseInt(m[1]), min=parseInt(m[2]);
+    if(/오후|pm/i.test(text) && h<12) h+=12;
+    return h*60+min;
+  }
+  // N시
+  m = text.match(/(\d{1,2})\s*시/);
+  if(m) {
+    let h=parseInt(m[1]);
+    if(/오후|pm/i.test(text) && h<12) h+=12;
+    return h*60;
+  }
+  return null;
+}
+
+// 역명 파싱
+const ALL_SEOUL_ST = [...SEOUL_STATIONS];
+const ALL_INCHEON_ST = [...INCHEON_STATIONS];
+const STATION_ALIASES = {
+  '서울역':'서울','동두천역':'동두천','의정부역':'의정부','소요산역':'소요산',
+  '도봉산역':'도봉산','광운대역':'광운대','부평역':'부평','인천역':'인천',
+  '동인천역':'동인천','주안역':'주안','용산역':'용산','영등포역':'영등포',
+  '구로역':'구로','창동역':'창동','양주역':'양주','청량리역':'청량리',
+};
+
+function parseStation(text) {
+  let t = text;
+  for(const [k,v] of Object.entries(STATION_ALIASES)) t=t.replace(k,v);
+  // 긴 이름 먼저
+  const all = [...ALL_SEOUL_ST,...ALL_INCHEON_ST].sort((a,b)=>b.length-a.length);
+  for(const s of all) { if(t.includes(s)) return s; }
+  return null;
+}
+
+function stationDir(st) {
+  if(ALL_SEOUL_ST.includes(st)) return 'seoul';
+  if(ALL_INCHEON_ST.includes(st)) return 'incheon';
+  return null;
+}
+
+// ================================================================
+// 5. 핵심 조회 함수
+// ================================================================
+function getTimetable(dir, date) {
+  const type = getDayType(date);
+  if(dir==='seoul') return type==='weekday' ? WD_SEOUL : WE_SEOUL;
+  else return type==='weekday' ? WD_INCHEON : WE_INCHEON;
+}
+
+function getNextTrains(dir, fromMin, date, station, count=3) {
+  const tt = getTimetable(dir, date);
+  return tt
+    .filter(tr => tr[0]>=fromMin && (station ? stops(tr, station, dir) : true))
+    .slice(0, count);
+}
+
+function getFirst(dir, date, station) {
+  const tt = getTimetable(dir, date);
+  const trains = station ? tt.filter(tr=>stops(tr,station,dir)) : tt;
+  return trains[0]||null;
+}
+
+function getLast(dir, date, station) {
+  const tt = getTimetable(dir, date);
+  const trains = station ? tt.filter(tr=>stops(tr,station,dir)) : tt;
+  return trains[trains.length-1]||null;
+}
+
+function getInterval(dir) {
+  const now = nowMin();
+  const tt = getTimetable(dir, new Date());
+  const nearby = tt.filter(tr=>tr[0]>=now-10 && tr[0]<=now+30);
+  if(nearby.length<2) return null;
+  const gaps=[];
+  for(let i=1;i<nearby.length;i++) gaps.push(nearby[i][0]-nearby[i-1][0]);
+  return Math.round(gaps.reduce((a,b)=>a+b,0)/gaps.length);
+}
+
+// ================================================================
+// 6. 질문 해석
+// ================================================================
+let currentDir = 'seoul';
+
+function setDir(d) {
+  currentDir = d;
+  document.getElementById('tab-seoul').classList.toggle('on', d==='seoul');
+  document.getElementById('tab-incheon').classList.toggle('on', d==='incheon');
+}
+
+function interpret(text) {
+  const tl = text.toLowerCase();
+  const targetDate = parseTargetDate(text);
+  const dayType = getDayType(targetDate);
+  const dayLabel = getDayLabel(dayType);
+  const isToday = targetDate.toDateString()===new Date().toDateString();
+  const isTomorrow = !isToday && targetDate.getDate()===new Date().getDate()+1;
+
+  // 역명 감지 → 방향 자동 전환
+  const station = parseStation(text);
+  let dir = currentDir;
+  if(station) {
+    const sd = stationDir(station);
+    if(sd) { dir=sd; setDir(dir); }
+  }
+
+  const timeFromNow = isToday ? nowMin() : 0;
+  const parsedTime = parseTime(text);
+
+  // 첫차
+  if(/첫\s*차|첫차|처음|시작|first/i.test(tl)) {
+    const train = getFirst(dir, targetDate, station);
+    return { type:'first', train, dir, dayType, dayLabel, station, targetDate };
+  }
+  // 막차
+  if(/막\s*차|막차|마지막|last/i.test(tl)) {
+    const train = getLast(dir, targetDate, station);
+    return { type:'last', train, dir, dayType, dayLabel, station, targetDate };
+  }
+  // 배차간격
+  if(/배차|간격|몇\s*분\s*마다|자주/i.test(tl)) {
+    const interval = getInterval(dir);
+    return { type:'interval', interval, dir };
+  }
+  // 혼잡도
+  if(/혼잡|붐비|사람|많아|복잡/i.test(tl)) {
+    return { type:'congestion' };
+  }
+  // 특정 시간 이후
+  if(parsedTime!==null) {
+    const fromMin = parsedTime;
+    const trains = getNextTrains(dir, fromMin, targetDate, station, 3);
+    return { type:'specific', trains, dir, dayType, dayLabel, fromMin, station, targetDate };
+  }
+  // 다음 차 (지금 기준)
+  if(/다음|지금|바로|빠른|언제|next/i.test(tl) || station) {
+    const trains = getNextTrains(dir, timeFromNow, isToday?new Date():targetDate, station, 3);
+    return { type:'next', trains, dir, dayType, dayLabel, station };
+  }
+
+  return { type:'unknown' };
+}
+
+// ================================================================
+// 7. 응답 생성
+// ================================================================
+function typeBadge(type) {
+  if(type==='express') return '<span class="badge ex">급행</span>';
+  if(type==='special') return '<span class="badge sp">특급</span>';
+  return '<span class="badge nr">완행</span>';
+}
+
+function trainNo(train) {
+  return `<span class="badge no">${train[2]==='local'?'완행':train[2]==='express'?'급행':'특급'} ${minToStr(train[0])}</span>`;
+}
+
+function dayBadgeHTML(dayType, dayLabel) {
+  return `<div class="day-badge ${dayType==='weekday'?'weekday':dayType==='holiday'?'holiday':'weekend'}">${dayLabel} 시간표</div>`;
+}
+
+function stLabel(station) { return station?` (${station} 경유)`:''; }
+
+function buildResponse(result) {
+  if(result.type==='first') {
+    const tr=result.train;
+    if(!tr) return { text:`${result.dayLabel} 시간표 기준 첫차 정보를 찾을 수 없어요.` };
+    const dir=result.dir==='seoul'?'서울':'인천';
+    return {
+      text:`${dir} 방향 첫차${stLabel(result.station)}예요.`,
+      dayType:result.dayType, dayLabel:result.dayLabel,
+      card:{ hl:true, lbl:'🌅 첫차', time:minToStr(tr[0]), dest:tr[1], type:tr[2] }
+    };
+  }
+  if(result.type==='last') {
+    const tr=result.train;
+    if(!tr) return { text:`${result.dayLabel} 시간표 기준 막차 정보를 찾을 수 없어요.` };
+    const dir=result.dir==='seoul'?'서울':'인천';
+    return {
+      text:`${dir} 방향 막차${stLabel(result.station)}예요.`,
+      dayType:result.dayType, dayLabel:result.dayLabel,
+      card:{ hl:false, lbl:'🌙 막차', time:minToStr(tr[0]), dest:tr[1], type:tr[2] }
+    };
+  }
+  if(result.type==='next') {
+    if(!result.trains.length) return { text:'지금은 운행이 종료됐어요. 내일 첫차를 이용해주세요. 🌙' };
+    const now=nowMin();
+    const dir=result.dir==='seoul'?'서울':'인천';
+    return {
+      text:`${dir} 방향 다음 열차${stLabel(result.station)}예요.`,
+      dayType:result.dayType, dayLabel:result.dayLabel,
+      multi: result.trains.map((tr,i)=>({
+        time:minToStr(tr[0]), dest:tr[1], type:tr[2],
+        sub: i===0?(tr[0]-now<=0?'곧 출발':`${tr[0]-now}분 후`):''
+      }))
+    };
+  }
+  if(result.type==='specific') {
+    if(!result.trains.length) return { text:`${minToStr(result.fromMin)} 이후${stLabel(result.station)} 열차가 없어요.` };
+    const dir=result.dir==='seoul'?'서울':'인천';
+    const dateStr=result.targetDate.toDateString()===new Date().toDateString()?'오늘':'내일';
+    return {
+      text:`${dateStr} ${minToStr(result.fromMin)} 이후 ${dir} 방향${stLabel(result.station)} 열차예요.`,
+      dayType:result.dayType, dayLabel:result.dayLabel,
+      multi: result.trains.map((tr,i)=>({
+        time:minToStr(tr[0]), dest:tr[1], type:tr[2],
+        sub: i===0?`${dateStr} ${minToStr(result.fromMin)} 이후 첫 차`:''
+      }))
+    };
+  }
+  if(result.type==='interval') {
+    const iv=result.interval;
+    if(!iv) return { text:'현재 시간대 배차 정보를 계산할 수 없어요.' };
+    const peak=isPeak();
+    return { text:`현재 배차 간격은 약 <b>${iv}분</b>이에요.<br>${peak?'⚠️ 지금은 혼잡 시간대예요.':'현재는 비교적 여유로운 시간대예요.'}` };
+  }
+  if(result.type==='congestion') {
+    const h=new Date().getHours();
+    let msg;
+    if(h>=7&&h<9) msg='⚠️ 출근 피크예요. 매우 혼잡할 수 있어요.';
+    else if(h>=17&&h<20) msg='⚠️ 퇴근 피크예요. 매우 혼잡할 수 있어요.';
+    else if(h>=23||h<6) msg='😌 심야 시간대예요. 여유로워요.';
+    else msg='🙂 현재는 비교적 여유로운 시간대예요.';
+    return { text:msg };
+  }
+  return { text:'잘 이해하지 못했어요. 예시처럼 물어봐 주세요.\n예) "도봉산 다음 차 알려줘" / "내일 첫차" / "오후 3시 이후 의정부 가는 차"' };
+}
+
+function isPeak() {
+  const h=new Date().getHours();
+  return (h>=7&&h<9)||(h>=17&&h<20);
+}
+
+// ================================================================
+// 8. UI 렌더링
+// ================================================================
+const chatEl = document.getElementById('chat');
+
+function scrollBot() { setTimeout(()=>chatEl.scrollTop=chatEl.scrollHeight,50); }
+
+function appendUser(text) {
+  const row=document.createElement('div');
+  row.className='row me';
+  row.innerHTML=`<div class="bbl">${text}</div><div class="ts">${nowStr()}</div>`;
+  chatEl.appendChild(row);
+  scrollBot();
+}
+
+function showTyping() {
+  const el=document.createElement('div');
+  el.className='row bot'; el.id='typing';
+  el.innerHTML='<div class="typing-wrap"><div class="td"></div><div class="td"></div><div class="td"></div></div>';
+  chatEl.appendChild(el); scrollBot();
+}
+function hideTyping() { const el=document.getElementById('typing'); if(el) el.remove(); }
+
+function appendBot(resp) {
+  if(resp.text) {
+    const row=document.createElement('div');
+    row.className='row bot';
+    let html='';
+    if(resp.dayType && resp.dayLabel) html+=dayBadgeHTML(resp.dayType, resp.dayLabel);
+    html+=`<div class="bbl">${resp.text.replace(/\n/g,'<br>')}</div>`;
+    html+=`<div class="ts">${nowStr()}</div>`;
+    row.innerHTML=html;
+    chatEl.appendChild(row);
+  }
+  if(resp.card) {
+    const c=resp.card;
+    const el=document.createElement('div');
+    el.className='card'+(c.hl?' hl':'');
+    el.innerHTML=`
+      <div class="card-lbl">${c.lbl}</div>
+      <div class="card-time">${c.time}<span class="u">출발</span></div>
+      <div class="card-dest"><b>${c.dest}</b>행</div>
+      <div class="badges">${typeBadge(c.type)}</div>`;
+    chatEl.appendChild(el);
+  }
+  if(resp.multi) {
+    const wrap=document.createElement('div');
+    wrap.className='multi';
+    resp.multi.forEach((item,i)=>{
+      const mi=document.createElement('div');
+      mi.className='mi';
+      mi.innerHTML=`
+        <div class="mi-l">
+          <div class="mi-time">${item.time}</div>
+          <div class="mi-sub">${item.dest}행${item.sub?` · <span style="color:var(--green)">${item.sub}</span>`:''}</div>
+        </div>
+        <div class="mi-r">${typeBadge(item.type)}</div>`;
+      wrap.appendChild(mi);
+    });
+    chatEl.appendChild(wrap);
+  }
+  saveChat();
+  scrollBot();
+}
+
+// ================================================================
+// 9. 채팅 저장/복원/초기화
+// ================================================================
+function saveChat() {
+  try { localStorage.setItem('bucheon_v2', chatEl.innerHTML); } catch(e){}
+}
+function loadChat() {
+  try {
+    const s=localStorage.getItem('bucheon_v2');
+    if(s && s.length>100) { chatEl.innerHTML=s; scrollBot(); return true; }
+  } catch(e){}
+  return false;
+}
+function clearChat() {
+  chatEl.innerHTML='';
+  try { localStorage.removeItem('bucheon_v2'); } catch(e){}
+  greet();
+}
+
+// ================================================================
+// 10. 시계
+// ================================================================
+function updateClock() {
+  const n=new Date();
+  const s=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0');
+  document.getElementById('clock').textContent=s;
+}
+setInterval(updateClock,1000); updateClock();
+
+// ================================================================
+// 11. 메시지 전송
+// ================================================================
+// 시간 형식 감지 → 오전/오후 팝업
+function checkAmPm(val) {
+  // HH:MM 또는 H:MM 또는 N시 M분 형태이고 오전/오후 없으면 팝업
+  const hasTime = /\d{1,2}:\d{2}|\d{1,2}\s*시/.test(val);
+  const hasAmPm = /오전|오후|am|pm/i.test(val);
+  const popup = document.getElementById('ampm-popup');
+  if(hasTime && !hasAmPm && val.trim().length > 0) {
+    popup.classList.add('show');
+  } else {
+    popup.classList.remove('show');
+  }
+}
+
+function applyAmPm(prefix) {
+  const inp = document.getElementById('inp');
+  const val = inp.value.trim();
+  inp.value = prefix + ' ' + val;
+  document.getElementById('ampm-popup').classList.remove('show');
+  inp.focus();
+  // 바로 전송
+  send();
+}
+
+function send() {
+  const inp=document.getElementById('inp');
+  const text=inp.value.trim(); if(!text) return;
+  inp.value='';
+  document.getElementById('ampm-popup').classList.remove('show');
+  appendUser(text);
+  showTyping();
+  setTimeout(()=>{
+    hideTyping();
+    const result=interpret(text);
+    const resp=buildResponse(result);
+    appendBot(resp);
+  },250);
+}
+function qa(text) { document.getElementById('inp').value=text; send(); }
+
+// ================================================================
+// 12. 인사말
+// ================================================================
+function greet() {
+  const h=new Date().getHours();
+  let g='';
+  if(h<6) g='심야에도 부천역 시간표를 확인할 수 있어요. 🌙';
+  else if(h<10) g='좋은 아침이에요! 오늘도 안전한 출근 되세요. 🌅';
+  else if(h<14) g='좋은 오전이에요! 무엇을 도와드릴까요? ☀️';
+  else if(h<18) g='안녕하세요! 오늘 오후도 순조롭게! 🌤';
+  else g='저녁 시간이네요. 퇴근 잘 하세요! 🚇';
+
+  const today=new Date();
+  const dayType=getDayType(today);
+  const extra=dayType!=='weekday'?`<br>오늘은 <b>${getDayLabel(dayType)}</b>이에요. 주말·공휴일 시간표가 적용됩니다.`:'';
+
+  appendBot({ text:`부천역 1호선 시간표 챗봇이에요.<br><br>${g}${extra}<br><br>위 탭에서 방향을 선택하거나, 아래 버튼을 눌러보거나, 자유롭게 질문해주세요!` });
+}
+
+if(!loadChat()) greet();
+</script>
+</body>
+</html>
