@@ -1028,6 +1028,10 @@ function greet() {
 }
 
 if(!loadChat()) greet();
+
+if('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js');
+}
 </script>
 </body>
 </html>
