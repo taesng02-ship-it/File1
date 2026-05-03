@@ -215,14 +215,22 @@ const INCHEON_STATIONS = [
   '중동','송내','부개','부평','백운','동암','간석','주안','도화','제물포','도원','동인천','인천'
 ];
 
-// 서울방향 급행 정차역 (구로~광운대 전구간 정차, 이후 선별)
-const SEOUL_EXPRESS_STOPS = new Set([
-  // 구로~광운대 전부
-  '구로','신도림','영등포','신길','대방','노량진','용산','남영',
-  '서울','시청','종각','종로3가','종로5가','동대문','동묘앞','신설동','제기동','청량리',
-  '회기','외대앞','신이문','석계','광운대',
-  // 광운대 이후 급행 정차역
-  '창동','도봉산','회룡','의정부','양주','덕정','동두천중앙','동두천'
+// 용산급행/특급 정차역 (구로~용산만, 이후 운행 없음)
+const YONGSAN_EXPRESS_STOPS = new Set([
+  '구로','신도림','영등포','신길','대방','노량진','용산'
+]);
+
+// 동두천급행 정차역
+// 동두천~광운대 구간: 일부 역만 정차
+// 광운대 이후~인천: 모든 역 정차 (완행과 동일)
+const DDCHEON_EXPRESS_STOPS = new Set([
+  // 광운대 이북 급행 정차역
+  '동두천','동두천중앙','지행','덕정','덕계','양주','의정부','회룡','도봉산','창동','광운대',
+  // 광운대 이남 전부 정차 (완행과 동일)
+  '월계','녹천','석계','신이문','외대앞','회기','청량리',
+  '제기동','신설동','동묘앞','동대문','종로5가','종로3가','종각','시청','서울',
+  '남영','용산','노량진','대방','신길','영등포','신도림','구로',
+  '구일','개봉','오류동','온수','역곡','소사','부천'
 ]);
 
 // 인천방향 급행 정차역
@@ -261,8 +269,10 @@ function stops(train, targetStation, dir) {
 
   // 3) 급행/특급 정차역 확인
   if(dir==='seoul') {
-    // 소사~구일은 급행도 정차 안 함 (구로부터 시작)
-    return SEOUL_EXPRESS_STOPS.has(targetStation);
+    // 동두천급행: 동두천~광운대 일부역만, 광운대 이후 전역 정차
+    if(dest==='동두천' && type==='express') return DDCHEON_EXPRESS_STOPS.has(targetStation);
+    // 용산급행/특급: 구로~용산만
+    return YONGSAN_EXPRESS_STOPS.has(targetStation);
   } else {
     if(type==='special') return INCHEON_SPECIAL_STOPS.has(targetStation);
     if(type==='express') return INCHEON_EXPRESS_STOPS.has(targetStation);
