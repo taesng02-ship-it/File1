@@ -371,28 +371,38 @@ function parseTargetDate(text) {
 
 // 텍스트에서 시간(분) 파싱
 function parseTime(text) {
+  const isAM = /오전|am/i.test(text);
+  const isPM = /오후|pm/i.test(text);
+
   // 날짜 형식(N/M) 제거 후 시간 파싱 (5/3 4:16에서 3:을 시간으로 오인 방지)
   const cleaned = text.replace(/\d{1,2}\/\d{1,2}/, '');
+
+  function applyAmPm(h) {
+    if(isPM && h < 12) return h + 12;  // 오후 1~11시 → 13~23시
+    if(isPM && h === 12) return 12;    // 오후 12시 = 12:00 (정오)
+    if(isAM && h === 12) return 0;     // 오전 12시 = 00:00 (자정)
+    return h;
+  }
+
   // HH:MM
   let m = cleaned.match(/(\d{1,2}):(\d{2})/);
   if(m) {
-    let h=parseInt(m[1]), min=parseInt(m[2]);
-    if(/오후|pm/i.test(text) && h<12) h+=12;
-    return h*60+min;
+    let h = applyAmPm(parseInt(m[1]));
+    let min = parseInt(m[2]);
+    return h * 60 + min;
   }
   // N시 M분
   m = text.match(/(\d{1,2})\s*시\s*(\d{1,2})\s*분/);
   if(m) {
-    let h=parseInt(m[1]), min=parseInt(m[2]);
-    if(/오후|pm/i.test(text) && h<12) h+=12;
-    return h*60+min;
+    let h = applyAmPm(parseInt(m[1]));
+    let min = parseInt(m[2]);
+    return h * 60 + min;
   }
   // N시
   m = text.match(/(\d{1,2})\s*시/);
   if(m) {
-    let h=parseInt(m[1]);
-    if(/오후|pm/i.test(text) && h<12) h+=12;
-    return h*60;
+    let h = applyAmPm(parseInt(m[1]));
+    return h * 60;
   }
   return null;
 }
