@@ -146,6 +146,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--t1);font-
   </div>
 </div>
 <script src="data.js"></script>
+<script src="stations.js"></script>
 <script>
 // ================================================================
 // 1. 공휴일 (2025~2026)
@@ -432,6 +433,16 @@ function stationDir(st) {
   return null;
 }
 
+// OTHER_STATIONS에서 역명 파싱
+function parseOtherStation(text) {
+  let t = text;
+  for(const [k,v] of Object.entries(STATION_ALIASES)) t=t.replace(k,v);
+  // 긴 이름 먼저
+  const keys = Object.keys(OTHER_STATIONS).sort((a,b)=>b.length-a.length);
+  for(const s of keys) { if(t.includes(s)) return s; }
+  return null;
+}
+
 // ================================================================
 // 5. 핵심 조회 함수
 // ================================================================
@@ -495,6 +506,12 @@ function interpret(text) {
   if(station) {
     const sd = stationDir(station);
     if(sd) { dir=sd; setDir(dir); }
+  }
+
+  // 1호선 외 역 감지
+  const otherStation = !station ? parseOtherStation(text) : null;
+  if(otherStation && typeof OTHER_STATIONS !== 'undefined' && OTHER_STATIONS[otherStation]) {
+    return { type:'other_station', name:otherStation, line:OTHER_STATIONS[otherStation].line };
   }
 
   const timeFromNow = isToday ? nowMin() : 0;
@@ -614,6 +631,9 @@ function buildResponse(result) {
     else if(h>=23||h<6) msg='😌 심야 시간대예요. 여유로워요.';
     else msg='🙂 현재는 비교적 여유로운 시간대예요.';
     return { text:msg };
+  }
+  if(result.type==='other_station') {
+    return { text:`<b>${result.name}역</b>은 <b>${result.line}</b>이에요.` };
   }
   return { text:'잘 이해하지 못했어요. 예시처럼 물어봐 주세요.\n예) "도봉산 다음 차 알려줘" / "내일 첫차" / "오후 3시 이후 의정부 가는 차"' };
 }
